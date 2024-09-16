@@ -193,7 +193,7 @@ def convert(currency_from, currency_to, amnt, replace_commas=True):
     if not isinstance(amnt, float) and not isinstance(amnt, int):
         raise TypeError("amount should be either int or float, passed %s" % type(amnt))
 
-    url = "http://216.58.221.46/search?q=convert+{amount}+{frm}+to+{to}&hl=en&lr=lang_en".format(amount = str(amnt),
+    url = "https://google.com/search?q=convert+{amount}+{frm}+to+{to}&hl=en&lr=lang_en".format(amount = str(amnt),
                                                                                                  frm    = currency_from,
                                                                                                  to     = currency_to)
 
@@ -220,7 +220,8 @@ def convert(currency_from, currency_to, amnt, replace_commas=True):
         if currency_to_name == currency_from_name:
             default_response["converted"] = True
             default_response["amount"]    = float(amnt)
-            return default_response
+            return float(amnt)
+
 
         # response = requests.get(url)
         response = requests.get(url, headers={"Range": "bytes=0-1"})
@@ -228,18 +229,17 @@ def convert(currency_from, currency_to, amnt, replace_commas=True):
         html = response.text
 
         results = re.findall("[\d*\,]*\.\d* {currency_to_name}".format(currency_to_name=currency_to_name), html)
-
         # converted_amount_str = "0.0 {to}".format(to=currency_to)
         if results.__len__() > 0:
             converted_amount_str = results[0]
             converted_currency = re.findall('[\d*\,]*\.\d*', converted_amount_str)[0]
+            return converted_currency
 
             if replace_commas:
                 converted_currency = converted_currency.replace(',', '')
 
             default_response["amount"]    = converted_currency
             default_response["converted"] = True
-            return converted_currency
         else:
             raise Exception("Unable to convert currency, failed to fetch results from Google")
 
@@ -252,5 +252,3 @@ def convert(currency_from, currency_to, amnt, replace_commas=True):
     except Exception as error:
         logger.error(error)
 
-    finally:
-        return converted_currency

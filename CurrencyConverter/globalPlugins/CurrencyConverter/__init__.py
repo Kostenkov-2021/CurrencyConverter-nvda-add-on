@@ -1,3 +1,4 @@
+import threading
 import config
 import wx
 import gui
@@ -42,12 +43,14 @@ class TextWindow(wx.Dialog):
 		if k==wx.WXK_ESCAPE:
 			self.Destroy()
 		event.Skip()
-
 	def a1(self,event):
 		config.conf[roleSECTION]["from"]=ad[self.sou.StringSelection]
 		config.conf[roleSECTION]["to"]=ad[self.sou1.StringSelection]
-		a=gc.convert(config.conf[roleSECTION]["from"],config.conf[roleSECTION]["to"],self.outputCtrl.GetValue())
-		re(a,"result")
+		try:
+			a=gc.convert(config.conf[roleSECTION]["from"],config.conf[roleSECTION]["to"],self.outputCtrl.GetValue())
+		except Exception as e:
+			a=_("error ") + "\n" + str(e)
+		re(str(a),"result")
 		self.Close()
 class re(wx.Dialog):
 	def __init__(self, text, title):
